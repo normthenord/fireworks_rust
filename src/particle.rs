@@ -11,6 +11,7 @@ pub struct Particle {
     acceleration: Vec2,
     radius: f32,
     lifetime: f64,
+    alive: bool,
     color: Color,
 }
 
@@ -22,6 +23,7 @@ impl Particle {
             acceleration: Vec2::default(),
             radius,
             lifetime: 1.0,
+            alive: true,
             color: RED,
         }
     }
@@ -40,10 +42,15 @@ impl Particle {
     pub fn update(&mut self) {
         self.velocity += self.acceleration;
         self.position += self.velocity;
-        self.acceleration = Vec2 { x: 0.0, y: 0.0 };
+        // self.acceleration = Vec2 { x: 0.0, y: 0.2 };
+        if self.lifetime < 0.0 {
+            self.alive = false;
+        }
     }
     pub fn draw(&self) {
-        draw_circle(self.position.x, self.position.y, self.radius, self.color);
-        println!("{}", self.position);
+        if self.alive {
+            draw_circle(self.position.x, self.position.y, self.radius, self.color);
+            println!("{}", self.position);
+        }
     }
 }
