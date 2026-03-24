@@ -4,11 +4,11 @@ use particle::*;
 
 #[macroquad::main("Fireworks!")]
 async fn main() {
+    let mut particle = Particle::new(100., 100., 20.0)
+        .with_speed(Vec2 { x: 0.2, y: 0.20 })
+        .with_acceleration(Vec2 { x: 0.0, y: 0.0 });
     loop {
         clear_background(BLACK);
-        let mut particle = Particle::new(100., 100.)
-            .with_speed(Vec2 { x: 2., y: 2. })
-            .with_acceleration(Vec2 { x: 5., y: 4. });
 
         particle.update();
         particle.draw();
