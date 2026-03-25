@@ -6,13 +6,13 @@ use macroquad::{
 
 #[derive(Debug)]
 pub struct Particle {
-    position: Vec2,
-    velocity: Vec2,
-    acceleration: Vec2,
-    radius: f32,
-    lifetime: f64,
-    alive: bool,
-    color: Color,
+    pub position: Vec2,
+    pub velocity: Vec2,
+    pub acceleration: Vec2,
+    pub radius: f32,
+    pub lifetime: f64,
+    pub alive: bool,
+    pub color: Color,
 }
 
 impl Particle {
@@ -50,7 +50,6 @@ impl Particle {
     pub fn draw(&self) {
         if self.alive {
             draw_circle(self.position.x, self.position.y, self.radius, self.color);
-            println!("{}", self.position);
         }
     }
 }
