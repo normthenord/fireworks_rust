@@ -1,11 +1,33 @@
 use macroquad::color::*;
 use macroquad::rand::gen_range;
 
-pub const COLORS_LIST: [Color; 10] = [
-        RED, GREEN, BLUE, YELLOW, ORANGE,
-        PINK, PURPLE, SKYBLUE, LIME, GOLD,
-    ];
-
+// pub const COLORS_LIST: [Color; 10] = [
+//         RED, GREEN, BLUE, YELLOW, ORANGE,
+//         PINK, PURPLE, SKYBLUE, LIME, GOLD,
+//     ];
+pub const COLORS_LIST: [Color; 23] = [BEIGE,
+BLANK,
+BLUE,
+BROWN,
+DARKBLUE,
+DARKBROWN,
+DARKGRAY,
+DARKGREEN,
+DARKPURPLE,
+GOLD,
+GRAY,
+GREEN,
+LIGHTGRAY,
+LIME,
+MAGENTA,
+MAROON,
+ORANGE,
+PINK,
+PURPLE,
+RED,
+SKYBLUE,
+VIOLET,
+YELLOW,];
 
 pub fn random_macroquad_color () -> Color {
     let idx = gen_range(0, COLORS_LIST.len());

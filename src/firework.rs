@@ -22,7 +22,6 @@ impl Firework {
     pub fn update(&mut self) {
         self.rocket.update();
         if self.rocket.velocity.y >= 0.0 && !self.exploded {
-            println!("Rocket exploded!");
             self.explode();
         }
 
@@ -46,13 +45,26 @@ impl Firework {
         for _ in 0..30 {
             let x_speed = rand::gen_range(-1.0, 1.0);
             let y_speed = rand::gen_range(-1.0, 1.0);
-            let particle = Particle::new(self.rocket.position.x, self.rocket.position.y, 2.0, RED)
-                .with_speed(Vec2 {
-                    x: x_speed,
-                    y: y_speed,
-                })
-                .with_acceleration(Vec2 { x: 0.0, y: 0.01 });
+            let particle = Particle::new(
+                self.rocket.position.x,
+                self.rocket.position.y,
+                2.0,
+                self.color,
+            )
+            .with_speed(Vec2 {
+                x: x_speed,
+                y: y_speed,
+            })
+            .with_acceleration(Vec2 { x: 0.0, y: 0.005 });
             self.particles.push(particle);
         }
     }
+
+    pub fn age (&mut self) {
+        for particle in &mut self.particles {
+            particle.lifetime -= 0.005;
+        }
+    }
+
+
 }

@@ -1,8 +1,5 @@
 use macroquad::prelude::*;
-use macroquad::{
-    color::{Color, RED},
-    shapes::draw_circle,
-};
+use macroquad::{color::Color, shapes::draw_circle};
 
 #[derive(Debug)]
 pub struct Particle {
@@ -10,7 +7,7 @@ pub struct Particle {
     pub velocity: Vec2,
     pub acceleration: Vec2,
     pub radius: f32,
-    pub lifetime: f64,
+    pub lifetime: f32,
     pub alive: bool,
     pub color: Color,
 }
@@ -43,6 +40,7 @@ impl Particle {
         self.velocity += self.acceleration;
         self.position += self.velocity;
         // self.acceleration = Vec2 { x: 0.0, y: 0.2 };
+        self.color.a = self.lifetime as f32;
         if self.lifetime < 0.0 {
             self.alive = false;
         }
