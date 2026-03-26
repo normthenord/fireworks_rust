@@ -16,7 +16,7 @@ pub struct Particle {
 }
 
 impl Particle {
-    pub fn new(x: f32, y: f32, radius: f32) -> Particle {
+    pub fn new(x: f32, y: f32, radius: f32, color: Color) -> Particle {
         Particle {
             position: Vec2 { x, y },
             velocity: Vec2::default(),
@@ -24,7 +24,7 @@ impl Particle {
             radius,
             lifetime: 1.0,
             alive: true,
-            color: RED,
+            color,
         }
     }
 

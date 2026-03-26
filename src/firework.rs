@@ -43,10 +43,15 @@ impl Firework {
     pub fn explode(&mut self) {
         self.exploded = true;
 
-        for _ in 0..10 {
-            let particle = Particle::new(self.rocket.position.x, self.rocket.position.y, 2.0)
-                .with_speed(1.0 * Vec2::new(rand::gen_range(-1.0, 1.0), rand::gen_range(-1.0, 1.0)))
-                .with_acceleration(Vec2 { x: 0.0, y: 0.1 });
+        for _ in 0..30 {
+            let x_speed = rand::gen_range(-1.0, 1.0);
+            let y_speed = rand::gen_range(-1.0, 1.0);
+            let particle = Particle::new(self.rocket.position.x, self.rocket.position.y, 2.0, RED)
+                .with_speed(Vec2 {
+                    x: x_speed,
+                    y: y_speed,
+                })
+                .with_acceleration(Vec2 { x: 0.0, y: 0.01 });
             self.particles.push(particle);
         }
     }
