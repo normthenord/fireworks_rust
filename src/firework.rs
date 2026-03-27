@@ -1,3 +1,4 @@
+use crate::colors_list::random_macroquad_color;
 use crate::particle::*;
 use macroquad::color::Color;
 use macroquad::prelude::*;
@@ -10,7 +11,19 @@ pub struct Firework {
 }
 
 impl Firework {
-    pub fn new(rocket: Particle, color: Color) -> Firework {
+    pub fn new() -> Firework {
+        let firework_radius = 5.0;
+
+        let x_pos = rand::gen_range(firework_radius, screen_width() - firework_radius);
+        let y_velocity = rand::gen_range(-5, -13);
+        let color = random_macroquad_color();
+        let rocket = Particle::new(x_pos, screen_height(), firework_radius, color)
+            .with_speed(Vec2 {
+                x: 0.0,
+                y: y_velocity as f32,
+            })
+            .with_acceleration(Vec2 { x: 0.0, y: 0.05 });
+
         Firework {
             rocket,
             particles: Vec::new(),
@@ -61,11 +74,9 @@ impl Firework {
         }
     }
 
-    pub fn age (&mut self) {
+    pub fn age(&mut self) {
         for particle in &mut self.particles {
             particle.lifetime -= 0.005;
         }
     }
-
-
 }

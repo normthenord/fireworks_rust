@@ -37,7 +37,7 @@ pub fn random_macroquad_color () -> Color {
 }
 
 
-
+#[allow(dead_code)]
 pub fn random_color() -> Color {
     let red = gen_range(0.0, 1.0);
     let green = gen_range(0.0, 1.0);

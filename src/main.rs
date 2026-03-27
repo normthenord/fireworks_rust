@@ -4,11 +4,9 @@ mod particle;
 use firework::*;
 use macroquad::{
     prelude::*,
-    rand::{self, gen_range},
 };
-use particle::*;
 
-use crate::colors_list::{random_color, random_macroquad_color};
+// use crate::colors_list::{random_color, random_macroquad_color};
 
 #[macroquad::main("Fireworks!")]
 async fn main() {
@@ -23,7 +21,7 @@ async fn main() {
         clear_background(BLACK);
 
         if rand::gen_range(0, 10000) < 300 {
-            make_firework(&mut fireworks);
+            fireworks.push(Firework::new());
         }
 
         for firework in &mut fireworks {
@@ -38,19 +36,3 @@ async fn main() {
     }
 }
 
-fn make_firework(fireworks: &mut Vec<Firework>) {
-    let firework_radius = 5.0;
-
-    let x_pos = rand::gen_range(firework_radius, screen_width() - firework_radius);
-    let y_velocity = rand::gen_range(-5, -13);
-    let color = random_macroquad_color();
-    let particle = Particle::new(x_pos, screen_height(), firework_radius, color)
-        .with_speed(Vec2 {
-            x: 0.0,
-            y: y_velocity as f32,
-        })
-        .with_acceleration(Vec2 { x: 0.0, y: 0.05 });
-
-    let firework = Firework::new(particle, color);
-    fireworks.push(firework);
-}
