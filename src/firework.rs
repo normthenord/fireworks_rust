@@ -43,8 +43,8 @@ impl Firework {
         self.exploded = true;
 
         for _ in 0..30 {
-            let x_speed = rand::gen_range(-1.0, 1.0);
-            let y_speed = rand::gen_range(-1.0, 1.0);
+            let x_speed = rand::gen_range(-2.0, 2.0);
+            let y_speed = rand::gen_range(-2.0, 2.0);
             let particle = Particle::new(
                 self.rocket.position.x,
                 self.rocket.position.y,
@@ -55,7 +55,8 @@ impl Firework {
                 x: x_speed,
                 y: y_speed,
             })
-            .with_acceleration(Vec2 { x: 0.0, y: 0.005 });
+            .with_acceleration(Vec2 { x: 0.0, y: 0.01 })
+            .with_dampening(Vec2 { x: 0.98, y: 0.98 });
             self.particles.push(particle);
         }
     }

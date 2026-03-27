@@ -10,6 +10,7 @@ pub struct Particle {
     pub lifetime: f32,
     pub alive: bool,
     pub color: Color,
+    pub dampening: Vec2
 }
 
 impl Particle {
@@ -22,6 +23,7 @@ impl Particle {
             lifetime: 1.0,
             alive: true,
             color,
+            dampening: Vec2{x: 1.0, y: 1.0}
         }
     }
 
@@ -36,8 +38,15 @@ impl Particle {
         }
     }
 
+    pub fn with_dampening (self, dampening: Vec2) -> Particle {
+        Particle {dampening, ..self}
+    }
+
+
+
     pub fn update(&mut self) {
         self.velocity += self.acceleration;
+        self.velocity *= self.dampening;
         self.position += self.velocity;
         // self.acceleration = Vec2 { x: 0.0, y: 0.2 };
         self.color.a = self.lifetime as f32;
