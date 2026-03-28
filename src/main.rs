@@ -6,7 +6,6 @@ use macroquad::{
     prelude::*,
 };
 
-// use crate::colors_list::{random_color, random_macroquad_color};
 
 #[macroquad::main("Fireworks!")]
 async fn main() {
@@ -20,7 +19,15 @@ async fn main() {
 
         clear_background(BLACK);
 
-        if rand::gen_range(0, 10000) < 300 {
+
+        if is_mouse_button_pressed(MouseButton::Left) {
+            let mut firework = Firework::new();
+            firework.rocket.position = mouse_position().into();
+            firework.rocket.velocity = Vec2::default();
+            fireworks.push(firework);
+        }
+
+        if rand::gen_range(0, 10000) < 500 {
             fireworks.push(Firework::new());
         }
 
@@ -31,7 +38,6 @@ async fn main() {
         }
 
         fireworks.retain(|f| !f.exploded || f.particles.iter().any(|p| p.alive));
-
         next_frame().await
     }
 }
