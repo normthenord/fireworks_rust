@@ -1,7 +1,6 @@
 use crate::colors_list::random_macroquad_color;
 use crate::particle::*;
 use macroquad::color::Color;
-use macroquad::miniquad::MAX_SHADERSTAGE_IMAGES;
 use macroquad::prelude::*;
 
 pub struct Firework {
@@ -70,9 +69,9 @@ impl Firework {
     pub fn explode(&mut self) {
         self.exploded = true;
 
-        for _ in 0..30 {
-            let x_speed = rand::gen_range(-2.0, 2.0);
-            let y_speed = rand::gen_range(-2.0, 2.0);
+        for _ in 0..50 {
+            let x_speed = rand::gen_range(-3.0, 3.0);
+            let y_speed = rand::gen_range(-3.0, 3.0);
             let particle = Particle::new(
                 self.rocket.position.x,
                 self.rocket.position.y,

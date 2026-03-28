@@ -3,13 +3,16 @@ mod firework;
 mod particle;
 use firework::*;
 use macroquad::{
+    audio::{load_sound, play_sound, PlaySoundParams, Sound},
     prelude::*,
 };
-
 
 #[macroquad::main("Fireworks!")]
 async fn main() {
     set_fullscreen(true);
+
+    let _maybe_sound = maybe_sound("src/assets/1812overture.ogg").await;
+
     let mut fireworks = Vec::new();
 
     loop {
@@ -18,7 +21,6 @@ async fn main() {
         }
 
         clear_background(BLACK);
-
 
         if is_mouse_button_pressed(MouseButton::Left) {
             let mut firework = Firework::new();
@@ -42,3 +44,20 @@ async fn main() {
     }
 }
 
+
+async fn maybe_sound(path: &str) -> Option<Sound> {
+
+    match load_sound(path).await {
+        Ok(sound) => {
+            play_sound(
+                &sound,
+                PlaySoundParams {
+                    looped: true,
+                    volume: 1.0,
+                },
+            );
+            Some(sound)
+        }
+        Err(_) => None,
+    }
+}
