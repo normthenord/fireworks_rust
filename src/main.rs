@@ -7,11 +7,14 @@ use macroquad::{
     prelude::*,
 };
 
+
+
+const PATH: &str = "src/assets/1812overture.ogg";
+
 #[macroquad::main("Fireworks!")]
 async fn main() {
     set_fullscreen(true);
-
-    let _maybe_sound = maybe_sound("src/assets/1812overture.ogg").await;
+    let _maybe_sound = maybe_sound(PATH).await;
 
     let mut fireworks = Vec::new();
 
@@ -38,10 +41,21 @@ async fn main() {
             firework.draw();
             firework.age();
         }
-
+        frame_rate();
         fireworks.retain(|f| !f.exploded || f.particles.iter().any(|p| p.alive));
         next_frame().await
     }
+}
+
+
+fn frame_rate()  {
+    let frame_time = get_frame_time();
+    let fps = 1.0 / frame_time;
+
+    let fps_text = format!("FPS: {}", fps.round());
+    draw_text(&fps_text, 10.0, 20.0, 20.0, WHITE);
+
+
 }
 
 
