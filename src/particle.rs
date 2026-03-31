@@ -10,20 +10,22 @@ pub struct Particle {
     pub lifetime: f32,
     pub alive: bool,
     pub color: Color,
-    pub dampening: Vec2
+    pub dampening: Vec2,
 }
 
 impl Particle {
     pub fn new(x: f32, y: f32, radius: f32, color: Color) -> Particle {
+        let lifetime = rand::gen_range(0.8, 1.2);
+
         Particle {
             position: Vec2 { x, y },
             velocity: Vec2::default(),
             acceleration: Vec2::default(),
             radius,
-            lifetime: 1.0,
+            lifetime,
             alive: true,
             color,
-            dampening: Vec2{x: 1.0, y: 1.0}
+            dampening: Vec2 { x: 1.0, y: 1.0 },
         }
     }
 
@@ -38,11 +40,13 @@ impl Particle {
         }
     }
 
-    pub fn with_dampening (self, dampening: Vec2) -> Particle {
-        Particle {dampening, ..self}
+    pub fn with_dampening(self, dampening: Vec2) -> Particle {
+        Particle { dampening, ..self }
     }
 
-
+    // pub fn with_lifetime(self, lifetime: f32) -> Particle {
+    //     Particle { lifetime, ..self }
+    // }
 
     pub fn update(&mut self) {
         self.velocity += self.acceleration;
