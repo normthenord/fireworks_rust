@@ -18,6 +18,7 @@ pub enum FireworkType {
     RING,
     NORMAL,
     WILLOW,
+    CASCADE,
 }
 
 impl FireworkType {
@@ -26,6 +27,7 @@ impl FireworkType {
             0..20 => FireworkType::RING,
             20..50 => FireworkType::NORMAL,
             50..70 => FireworkType::WILLOW,
+            70..90 => FireworkType::CASCADE,
             _ => FireworkType::NORMAL,
         }
     }
@@ -75,6 +77,34 @@ impl Firework {
         for particle in &mut self.particles {
             particle.update();
         }
+
+        // Handle secondary explosions
+        let mut explosions = vec![];
+        for particle in &self.particles {
+            if particle.explosive && particle.explosion_timer <= 0.0 && particle.alive {
+                explosions.push((particle.position, particle.color));
+            }
+        }
+        for (pos, color) in explosions {
+            for _ in 0..15 {
+                let angle = rand::gen_range(0.0, TAU);
+                let speed = 2.0;
+                let x_speed = speed * angle.cos();
+                let y_speed = speed * angle.sin();
+                let new_particle = Particle::new(pos.x, pos.y, 2.0, color)
+                    .with_speed(Vec2 { x: x_speed, y: y_speed })
+                    .with_acceleration(Vec2 { x: 0.0, y: 0.01 })
+                    .with_dampening(Vec2 { x: 0.98, y: 0.98 });
+                self.particles.push(new_particle);
+            }
+        }
+        // Mark exploded particles as non-explosive
+        for particle in &mut self.particles {
+            if particle.explosive && particle.explosion_timer <= 0.0 {
+                particle.explosive = false;
+            }
+        }
+
         return false;
     }
 
@@ -99,6 +129,7 @@ impl Firework {
             FireworkType::RING => self.explode_ring(),
             FireworkType::NORMAL => self.explode_normal(),
             FireworkType::WILLOW => self.explode_willow(),
+            FireworkType::CASCADE => self.explode_cascade(),
         }
     }
 
@@ -166,7 +197,7 @@ impl Firework {
 
             let x_speed = explosion_radius * angle.cos();
             let y_speed = explosion_radius * angle.sin();
-        
+
             let particle = Particle::new(
                 self.rocket.position.x,
                 self.rocket.position.y,
@@ -183,12 +214,40 @@ impl Firework {
         }
     }
 
+    fn explode_cascade(&mut self) {
+        let max_speed = 3.0;
+        for _ in 0..20 {
+            let radius = rand::gen_range(3.0, 5.0);
+            let angle = rand::gen_range(0.0, TAU);
+            let explosion_radius = rand::gen_range(0.0, 1.0) * max_speed;
+
+            let x_speed = explosion_radius * angle.cos();
+            let y_speed = explosion_radius * angle.sin();
+
+            let particle = Particle::new(
+                self.rocket.position.x,
+                self.rocket.position.y,
+                radius,
+                self.color,
+            )
+            .with_speed(Vec2 {
+                x: x_speed,
+                y: y_speed,
+            })
+            .with_acceleration(Vec2 { x: 0.0, y: 0.01 })
+            .with_dampening(Vec2 { x: 0.98, y: 0.98 })
+            .with_explosive(1.0); // explode after 1.0 seconds (100 frames at 0.01 decrement)
+            self.particles.push(particle);
+        }
+    }
+
     pub fn age(&mut self) {
         for particle in &mut self.particles {
             match self.firework_type {
                 FireworkType::RING => particle.lifetime -= 0.005,
                 FireworkType::NORMAL => particle.lifetime -= 0.005,
                 FireworkType::WILLOW => particle.lifetime -= 0.0025,
+                FireworkType::CASCADE => particle.lifetime -= 0.005,
             }
         }
     }

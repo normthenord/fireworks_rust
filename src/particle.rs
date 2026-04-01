@@ -11,6 +11,8 @@ pub struct Particle {
     pub alive: bool,
     pub color: Color,
     pub dampening: Vec2,
+    pub explosive: bool,
+    pub explosion_timer: f32,
 }
 
 impl Particle {
@@ -26,6 +28,8 @@ impl Particle {
             alive: true,
             color,
             dampening: Vec2 { x: 1.0, y: 1.0 },
+            explosive: false,
+            explosion_timer: 0.0,
         }
     }
 
@@ -44,9 +48,9 @@ impl Particle {
         Particle { dampening, ..self }
     }
 
-    // pub fn with_lifetime(self, lifetime: f32) -> Particle {
-    //     Particle { lifetime, ..self }
-    // }
+    pub fn with_explosive(self, timer: f32) -> Particle {
+        Particle { explosive: true, explosion_timer: timer, ..self }
+    }
 
     pub fn update(&mut self) {
         self.velocity += self.acceleration;
@@ -56,6 +60,9 @@ impl Particle {
         self.color.a = self.lifetime as f32;
         if self.lifetime < 0.0 {
             self.alive = false;
+        }
+        if self.explosive {
+            self.explosion_timer -= 0.01;
         }
     }
     pub fn draw(&self) {

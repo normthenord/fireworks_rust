@@ -1,6 +1,7 @@
 mod colors_list;
 mod firework;
 mod particle;
+use anyhow::Result;
 use firework::*;
 use macroquad::{
     audio::{load_sound, play_sound, PlaySoundParams, Sound},
@@ -10,21 +11,19 @@ use macroquad::{
 // const PATH: &str = "src/assets/1812overture.ogg";
 
 #[macroquad::main("Fireworks!")]
-async fn main() {
+async fn main() -> Result<()> {
     set_fullscreen(true);
-    // clear_background(BLACK);
     // let _maybe_sound = maybe_sound(PATH).await;
-    let firework_sound = load_sound("assets/firework_sound.ogg").await.unwrap();
+    let firework_sound = load_sound("assets/firework_sound.ogg").await?;
+    // let firework_loud = load_sound("assets/firework_loud.ogg").await?;
     let mut fireworks = Vec::new();
 
     loop {
         if is_key_pressed(KeyCode::Q) {
-            break;
+            return Ok(());
         }
 
         clear_background(BLACK);
-        // let color = Color::new(0.0, 0.0, 0.0, 0.0001);
-        // draw_rectangle(0.0, 0.0, screen_width(), screen_height(), color);
 
         if is_mouse_button_pressed(MouseButton::Left) {
             let mut firework = Firework::new();
@@ -50,13 +49,13 @@ async fn main() {
             firework.draw();
             firework.age();
         }
-        frame_rate();
+        draw_frame_rate();
         fireworks.retain(|f| !f.exploded || f.particles.iter().any(|p| p.alive));
         next_frame().await
     }
 }
 
-fn frame_rate() {
+fn draw_frame_rate() {
     let frame_time = get_frame_time();
     let fps = 1.0 / frame_time;
 
