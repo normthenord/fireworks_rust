@@ -49,7 +49,11 @@ impl Particle {
     }
 
     pub fn with_explosive(self, timer: f32) -> Particle {
-        Particle { explosive: true, explosion_timer: timer, ..self }
+        Particle {
+            explosive: true,
+            explosion_timer: timer,
+            ..self
+        }
     }
 
     pub fn update(&mut self) {

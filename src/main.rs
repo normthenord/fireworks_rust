@@ -15,7 +15,8 @@ async fn main() -> Result<()> {
     set_fullscreen(true);
     // let _maybe_sound = maybe_sound(PATH).await;
     let firework_sound = load_sound("assets/firework_sound.ogg").await?;
-    // let firework_loud = load_sound("assets/firework_loud.ogg").await?;
+    let firework_loud = load_sound("assets/firework_loud.ogg").await?;
+    let fizzle_sound = load_sound("assets/firework_fizzle.ogg").await.unwrap_or_else(|_| firework_sound.clone());
     let mut fireworks = Vec::new();
 
     loop {
@@ -32,16 +33,38 @@ async fn main() -> Result<()> {
             fireworks.push(firework);
         }
 
-        if rand::gen_range(0, 10000) < 500 {
+        if rand::gen_range(0, 10000) < 100 {
             fireworks.push(Firework::new());
         }
 
         for firework in &mut fireworks {
             if firework.update() {
+                match firework.firework_type {
+                    FireworkType::BOOM => {
+                        play_sound(
+                            &firework_loud,
+                            PlaySoundParams {
+                                volume: 1.0,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                    _ => {
+                        play_sound(
+                            &firework_sound,
+                            PlaySoundParams {
+                                volume: 1.0,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                }
+            }
+            if firework.secondary_explosion_count > 0 {
                 play_sound(
-                    &firework_sound,
+                    &fizzle_sound,
                     PlaySoundParams {
-                        volume: 1.0,
+                        volume: 0.2, // maybe quieter for fizzle
                         ..Default::default()
                     },
                 );

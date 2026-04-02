@@ -4,7 +4,12 @@ use crate::colors_list::random_macroquad_color;
 use crate::particle::*;
 use macroquad::color::Color;
 use macroquad::prelude::*;
-use macroquad::rand::gen_range;
+// use macroquad::rand::gen_range;
+
+use ::rand::distr::weighted::WeightedIndex;
+use ::rand::prelude::*;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 pub struct Firework {
     pub rocket: Particle,
@@ -12,23 +17,38 @@ pub struct Firework {
     pub color: Color,
     pub exploded: bool,
     pub firework_type: FireworkType,
+    pub secondary_explosion_count: u32,
 }
 
+#[derive(Debug, EnumIter, Clone)]
 pub enum FireworkType {
     RING,
     NORMAL,
     WILLOW,
     CASCADE,
+    BOOM,
 }
 
 impl FireworkType {
     pub fn random() -> FireworkType {
-        match gen_range(0, 100) {
-            0..20 => FireworkType::RING,
-            20..50 => FireworkType::NORMAL,
-            50..70 => FireworkType::WILLOW,
-            70..90 => FireworkType::CASCADE,
-            _ => FireworkType::NORMAL,
+        let choices: Vec<FireworkType> = FireworkType::iter().collect();
+        let weights = choices.iter().map(|c| c.weight()).collect::<Vec<u32>>();
+
+        let dist = WeightedIndex::new(&weights).unwrap();
+
+        let mut rand = ::rand::rng();
+        let selected = &choices[dist.sample(&mut rand)];
+
+        selected.clone()
+    }
+
+    fn weight(&self) -> u32 {
+        match self {
+            FireworkType::RING => 20,
+            FireworkType::NORMAL => 30,
+            FireworkType::WILLOW => 20,
+            FireworkType::CASCADE => 20,
+            FireworkType::BOOM => 5,
         }
     }
 }
@@ -64,10 +84,12 @@ impl Firework {
             color,
             exploded: false,
             firework_type: firework_type,
+            secondary_explosion_count: 0,
         }
     }
 
     pub fn update(&mut self) -> bool {
+        self.secondary_explosion_count = 0;
         self.rocket.update();
         if self.rocket.velocity.y >= 0.0 && !self.exploded {
             self.explode();
@@ -85,6 +107,7 @@ impl Firework {
                 explosions.push((particle.position, particle.color));
             }
         }
+        self.secondary_explosion_count = explosions.len() as u32;
         for (pos, color) in explosions {
             for _ in 0..15 {
                 let angle = rand::gen_range(0.0, TAU);
@@ -92,7 +115,10 @@ impl Firework {
                 let x_speed = speed * angle.cos();
                 let y_speed = speed * angle.sin();
                 let new_particle = Particle::new(pos.x, pos.y, 2.0, color)
-                    .with_speed(Vec2 { x: x_speed, y: y_speed })
+                    .with_speed(Vec2 {
+                        x: x_speed,
+                        y: y_speed,
+                    })
                     .with_acceleration(Vec2 { x: 0.0, y: 0.01 })
                     .with_dampening(Vec2 { x: 0.98, y: 0.98 });
                 self.particles.push(new_particle);
@@ -130,6 +156,7 @@ impl Firework {
             FireworkType::NORMAL => self.explode_normal(),
             FireworkType::WILLOW => self.explode_willow(),
             FireworkType::CASCADE => self.explode_cascade(),
+            FireworkType::BOOM => self.explode_boom(),
         }
     }
 
@@ -241,6 +268,32 @@ impl Firework {
         }
     }
 
+    fn explode_boom(&mut self) {
+        let max_speed = 3.0;
+
+        for _ in 0..50 {
+            let angle = rand::gen_range(0.0, TAU);
+            let explosion_radius = rand::gen_range(0.0, 1.0) * max_speed;
+            let radius = rand::gen_range(2.0, 4.0);
+
+            let x_speed = explosion_radius * angle.cos();
+            let y_speed = explosion_radius * angle.sin();
+            let particle = Particle::new(
+                self.rocket.position.x,
+                self.rocket.position.y,
+                radius,
+                self.color,
+            )
+            .with_speed(Vec2 {
+                x: x_speed,
+                y: y_speed,
+            })
+            .with_acceleration(Vec2 { x: 0.0, y: 0.01 })
+            .with_dampening(Vec2 { x: 0.98, y: 0.98 });
+            self.particles.push(particle);
+        }
+    }
+
     pub fn age(&mut self) {
         for particle in &mut self.particles {
             match self.firework_type {
@@ -248,6 +301,7 @@ impl Firework {
                 FireworkType::NORMAL => particle.lifetime -= 0.005,
                 FireworkType::WILLOW => particle.lifetime -= 0.0025,
                 FireworkType::CASCADE => particle.lifetime -= 0.005,
+                FireworkType::BOOM => particle.lifetime -= 0.03,
             }
         }
     }
